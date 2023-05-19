@@ -1,159 +1,160 @@
 import pyautogui as gui  #needed for mouse and keyboard input
 import pandas as pd #needed for reading data
 import time
+import csv
 from PIL import Image
 import numpy as np
 
 def readdata(file):
-    df = pd.read_excel(file)
-    #print(df) #we need column 4 and 5
-    #from column 4 we need everything between ( and )
-    personen = df.iloc[:,3]
-    PLU = df.iloc[:,4]
+    if file.endswith('.xlsx') != True: #adding extension if needed
+        file = file + ".xlsx"
+    df = pd.read_excel(file) #reading in the data
+    plu = df.iloc[:, 4]
+    personen = df.iloc[:, 3]
+    id = personen.apply(lambda st: st[st.find("(") + 1:st.find(")")])  # extracting user unique ID's
+    mollie_ID = df.iloc[:,1]
+    aantal = df.iloc[:,5]
+    artikelnaam = df.iloc[:,2]
 
-    dates = df.iloc[:,0]
-
-    #if dates[0] <= dates[len(dates)-1]:
-        #raise Exception('Wrong data selected')
-
-    #controleren of de data goed geselecteerd is.
+    # Checking if data has correctly been selected
     if personen.name != "Persoon":
-        raise Exception('Wrong data selected')
+        raise Exception('Persoon header row not in the data')
+    if plu.name != "PLU":
+        raise Exception('PLU header row not in the data')
+    if len(plu) != len(personen):
+        raise Exception('PLU en personen data unequal length')
 
-    if PLU.name != "PLU":
-        raise Exception('Wrong data selected')
-
-    if len(PLU) != len(personen):
-        raise Exception('Wrong data selected')
-
-
-    ID = personen.apply(lambda st: st[st.find("(")+1:st.find(")")]) #extracting user unique ID's
-    return ID, PLU, personen
+    return id, plu, personen, aantal, mollie_ID, artikelnaam  #returning selected data
 
 #locaties op het scherm
-klantX = 280
-klantY = 280
-artikelX = 90
-artikelY = 720
-omschrijvingX = 666
-omschrijvingY = 495
-def insertData(userID,plu):
+KLANT_X = 280
+KLANT_Y = 280
+ARTIKEL_X = 90
+ARTIKEL_Y = 720
+OMSCHRIJVING_X = 666
+OMSCHRIJVING_Y = 495
+def insert_data(user_id, plu):
     #inputdata writes down the userID and plu into the correct boxes
-    gui.click(klantX,klantY)
-    gui.typewrite(userID)
-    time.sleep(0.1) #sleep to slow down program
-    gui.click(artikelX,artikelY)
+    gui.click(KLANT_X, KLANT_Y)
+    gui.typewrite(user_id)
+    gui.click(ARTIKEL_X, ARTIKEL_Y)
     gui.typewrite(str(plu))
-    time.sleep(0.1)
 
 #ranges that user name should appear in if the user is known to snelstart
-correctuserY = 285
-correctuserX1 = 350
-correctuserX2 = 470
-colorsumZonderKlant = 91800
-margin = 2000
-def checkuserisnkown(TestReference = "noref"):
-    debug = False
-    if TestReference != "noref": #checking if we are in debug mode
-        debug = True
 
-    if debug: #loading debug image or taking screenshot
-        image = Image.open(TestReference)
-    else:
-        screenshot = gui.screenshot()
-        screenshot.save("klantCheck.png")
-        time.sleep(0.1)  # sleep to slow down program
-        #Vo
-        image = Image.open('TestData/klantCheck.png');  # loading in the screenshot
-
-    colorsum = 0
-    for i in range(correctuserX1,correctuserX2):
-        colorsum = colorsum + sum(image.getpixel((i,correctuserY)) )
-
-    if debug:
-        print(colorsum)
-
-    if colorsum < colorsumZonderKlant - margin:
-        return True
-    else:
-        return False
-
-def insertUnkownUser(userID):
+def insert_unkown_user(userID):
     #removes user from box and insert unkown user, adds user id to description
     #removing data in klant
-    gui.click(klantX, klantY)
+    gui.click(KLANT_X, KLANT_Y)
     gui.hotkey("ctrl","a")
     gui.press("backspace")
     gui.typewrite("2") #insert unkown user
 
-    gui.click(omschrijvingX,omschrijvingY)
+    gui.click(OMSCHRIJVING_X, OMSCHRIJVING_Y)
     gui.typewrite(userID)
 
-def confirmInboeken():
-    gui.press("F5")
-    gui.hotkey("ALT","N")
-    time.sleep(8) #wait 8 second to print contantbon
-
-Threshold = 14345678
-def checkNoPopUp(refPopBuf, TestReference = "noref"):
+CORRECTUSER_Y = 285
+CORRECTUSER_X1 = 350
+CORRECTUSER_X2 = 470
+UNKOWNUSER_COLORSUM = 91800
+UNKOWNUSER_MARGIN = 2000
+def checkuserisnkown(test="notest"):
     debug = False
-    if TestReference != "noref": #checking if we are in debug mode
+    if test != "notest":  # checking if we are in debug mode
+        print(test)
+        debug = True
+
+    if debug:  # loading debug image or taking screenshot
+        image = Image.open(test)
+    else:
+        screenshot = gui.screenshot()
+        screenshot.save("klantCheck.png")
+        image = Image.open('TestData/klantCheck.png');  # loading in the screenshot
+
+    colorsum = 0
+    for i in range(CORRECTUSER_X1, CORRECTUSER_X2):
+        colorsum = colorsum + sum(image.getpixel((i, CORRECTUSER_Y)))
+
+    if debug:
+        print(colorsum)
+
+    if colorsum < UNKOWNUSER_COLORSUM - UNKOWNUSER_MARGIN:
+        return True
+    else:
+        return False
+
+NOPOPUP_THRESSHOLD = 14345678
+def checknopopup(refpop_buf, test="notest"):
+    debug = False
+    if test != "notest":  # checking if we are in debug mode
         debug = True
     time.sleep(0.5)
     while True:
-        if debug:#loading debug image or taking screenshot
-            print(TestReference)
-            image = Image.open(TestReference)
+        if debug:  # loading debug image or taking screenshot
+            print(test)
+            image = Image.open(test)
         else:
             screenshot = gui.screenshot()  # making screenshot
             screenshot.save("popupCheck.png")
-            time.sleep(0.1)
             image = Image.open("TestData/popupCheck.png")
 
-        time.sleep(0.1)  # sleep to slow down program
-        BufferCheck = np.asarray(image)# loading screenshot in as array
-        Difference = BufferCheck[300:1080, 1:1900] - refPopBuf[300:1080, 1:1900] #getting the differnce between image and refrence
-        greyscale = np.sum(Difference, 2)
-        result = np.sum(greyscale) #resulting collor difference value
-        if result <= Threshold:
+        check_buff = np.asarray(image)  # loading screenshot in as array
+        difference = check_buff[300:1080, 1:1900] - refpop_buf[300:1080,
+                                                    1:1900]  # getting the differnce between image and refrence
+        greyscale_diff = np.sum(difference, 2)
+        result = np.sum(greyscale_diff)  # resulting collor difference value
+        if result <= NOPOPUP_THRESSHOLD:
             if debug:
-                #im = Image.fromarray(greyscale)
-                #im.show()
+                # im = Image.fromarray(greyscale) #showing image takes long
+                # im.show()
                 print('NO POPUP DETECTED')
                 print(result)
             return
         else:
-            print("pop up detected")
+            print("POPUP DETECTED")
 
-        #Exiting for loop if in debug mode
-        if debug:
-            #im = Image.fromarray(greyscale)
-            #im.show()
+        if debug:  # Exiting for loop if in debug mode
+            # im = Image.fromarray(greyscale)
+            # im.show()
             print(result)
             return
 
-        time.sleep(1) # wait before checking again if popup has cleared
+        time.sleep(1)  # wait before checking again if popup has cleared
+        print("Checking again")
+
+def checklog(plu,artikelnaam,mollie_ID):
+    file = "log/" + plu + " " + artikelnaam + ".txt"
+    try
+    open()
+
+def confirm_inboeken():
+    gui.press("F5")
+    gui.hotkey("ALT","N")
+    time.sleep(8) #wait 8 second to print contantbon
 
 if __name__ == '__main__':
     print('Insert Name Excel Sheet')
     filename = input()
-    if filename.endswith('.xlsx') != True:
-        filename = filename + ".xlsx"
-    refPopImage = Image.open('TestData/snelstart.png') #load reference
-    refPopBuf = np.asarray(refPopImage)
+    refpop_im = Image.open('TestData/snelstart.png') #loading reference
+    refpop_buf = np.asarray(refpop_im) #creating refrence buffer
 
-    ID, PLU, personen = readdata(filename)
-    time.sleep(5) #delay such that you can change screen
-    for i in range(len(ID)):
-        insertData(ID[i],PLU[i]) #Fill in username and product
-        gui.click(omschrijvingX, omschrijvingY) #click away such that the omschrijving is not blue
-        checkNoPopUp(refPopBuf)  # Check if there is no popup
+    id, plu, personen, aantal, mollie_ID, artikelnaam= readdata(filename)
+    time.sleep(2) #delay such that you can change screen
+    for i in range(len(id)):
+        #check if data is in logbook
+        insert_data(id[i], plu[i]) #Fill in username and product
+        gui.click(OMSCHRIJVING_X, OMSCHRIJVING_Y) #click away such that the omschrijving is not blue
+        checknopopup(refpop_buf)  # Check if there is no popup
         if checkuserisnkown() != True:
-            insertUnkownUser(personen[i])
-        confirmInboeken() #print contantbon
+            #insert in unkownuserlogbook
+            insert_unkown_user(personen[i])
+        #insert data in logbook
+        confirm_inboeken() #print contantbon
         #locaties
 
     print("Inboeken Completed")
+
+
 #TODO
 # * GUI maken    fff
 #   - Startupscreen met allemaal 66 vo dingen

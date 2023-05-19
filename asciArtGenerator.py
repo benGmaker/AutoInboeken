@@ -17,7 +17,11 @@ def resize(image, new_width = 119):
     return image.resize((new_width, new_height))
 
 ASCII_CHARS = ["@", "#", "$", "%", "?", "*", "+", ";", ":", ",", "."]
-def generateASCIart(filename):
+def generateASCIart(filename: object) -> object:
+    """
+
+    :rtype: object
+    """
     image = Image.open(filename)
     # resize image
     image = resize(image);
