@@ -52,15 +52,19 @@ def test_log_inboeken():
 
 def asciart():
     asciArtGenerator.generateASCIart('ASCI-art/66logo.PNG')
-    text = ' snelstart inboeken'
-    font = 'tarty1'
-    tprint('the 66th presents', 'smslant')
-    tprint("versneldstart", font)
-    tprint('inboeken', font)
+
+
+def test_GUI():
+    gui = autoinboeken.CLI_GUI();
+    gui.startupscreen(1)
+    gui.printlogo()
 
 if __name__ == '__main__':
+    #test_GUI()
     #test_checkuseriskown()
     #test_checknopopup()
-    test_log_inboeken()
-    test_checklog()
+    #test_log_inboeken()
+    #test_checklog()
+
+
 

@@ -1,9 +1,57 @@
 import pyautogui as gui  #needed for mouse and keyboard input
 import pandas as pd #needed for reading data
 import time
-import csv
 from PIL import Image
 import numpy as np
+import os
+import sys
+import art
+from colorama import Fore, Back, Style
+
+FONT1 = 'tarty1'
+FPS = 10
+class CLI_GUI:
+    def __init__(self):
+        self.text1 = art.text2art(text = 'the 66th presents',font = 'smslant')
+        self.text2 = art.text2art(text = "versneldstart", font = FONT1)
+        self.text3 = art.text2art(text = "inboeken", font = FONT1)
+        self.text4 = art.text2art(text = '     Accelerated!',font = 'smslant')
+    def startupscreen(self, duration = 1    ):
+        print(Style.BRIGHT + " ")
+        d = 12
+        for i in range(FPS*duration):
+            ofset = i*3
+            os.system('cls')
+            self.printcolorcycle(self.text1, 10, ofset)
+            self.printcolorcycle(self.text2, 12, ofset)
+            self.printcolorcycle(self.text3, 10, ofset)
+            time.sleep(1 / FPS)
+
+    def printcolorcycle(self,text, basediv = 3, offset = 0):
+        count = offset
+        for i in text:
+
+            remainder = np.floor(count/basediv%3) #devide by three and round down
+            if remainder == 0:
+                sys.stdout.write(Fore.BLUE + i)
+            if remainder == 1:
+                sys.stdout.write(Fore.YELLOW + i)
+            if remainder == 2:
+                sys.stdout.write(Fore.BLUE   + i)
+            count += 1
+
+    STEPS = 1003
+    DURATION = 0.01
+    def printlogo(self):
+        with open("readme.txt", "r") as f:
+            logo = f.read()
+        print(" ")
+        step = len(logo) // self.STEPS
+        for i in range(self.STEPS):
+            sys.stdout.write(Fore.BLUE + logo[i*step+1:(i+1)*step])
+            time.sleep(self.DURATION/self.STEPS)
+        print(("made by Ben Gortemaker, Chairman & Editor-in-Chief of the 66th Board"))
+        print(Fore.YELLOW + self.text4)
 
 def readdata(file):
     if file.endswith('.xlsx') != True: #adding extension if needed
@@ -172,12 +220,14 @@ def confirm_inboeken():
     time.sleep(8) #wait 8 second to print contantbon
 
 if __name__ == '__main__':
-    print('Insert Name Excel Sheet')
+    cli_gui = CLI_GUI()
+    cli_gui.startupscreen(1)
+    print('\n Insert Name Excel Sheet')
     filename = input()
     refpop_im = Image.open('TestData/snelstart.png') #loading reference
     refpop_buf = np.asarray(refpop_im) #creating refrence buffer
     id, plu, personen, aantal, mollie_ID, artikelnaam= readdata(filename)
-    time.sleep(2) #delay such that you can change screen
+    cli_gui.printlogo()
 
     for i in range(len(id)):
         if checklog(plu[i],artikelnaam[i],mollie_ID[i], aantal[i]):#checking if inboek operation already has been done
@@ -192,18 +242,8 @@ if __name__ == '__main__':
         if aantal[i] != 1:insert_aantal(aantal[i]) #if aantall is other than 1 insert in aantal field
         select_verkoper()
         log_inboeken(plu[i],artikelnaam[i],mollie_ID[i],id[i],personen[i],aantal[i])#insert data in logbook
+
         confirm_inboeken() #print contantbon
-
-    print("Inboeken Completed")
-
-
-#TODO
-# * GUI maken
-#   - Startupscreen met allemaal 66 vo dingen
-#   - Countdown timer voor het beginnen
-#   - Ergens popup laten zien waar hij mee bezig is
-#   - Contact info van mij laten zien
-# * Het aantal column laten invullen (mensen uitboeken/meerdere dingen kopen) (if not equal 1)
-
-# * FINAL Compilen van code naar een E
-# * Website direct de excel laten downloaden
+        print("booked in {}x {}, {}, ({}) {}".format(aantal[i], plu[i],artikelnaam[i],id[i],personen[i],))
+    cli_gui.printlogo()
+    print("Inboeken has succesfully been Accererated!")
