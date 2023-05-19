@@ -63,7 +63,7 @@ def readdata(file):
     mollie_ID = df.iloc[:,1]
     aantal = df.iloc[:,5]
     artikelnaam = df.iloc[:,2]
-
+    #vo
     # Checking if data has correctly been selected
     if personen.name != "Persoon":
         raise Exception('Persoon header row not in the data')
