@@ -53,6 +53,20 @@ def insert_unkown_user(userID):
     gui.click(OMSCHRIJVING_X, OMSCHRIJVING_Y)
     gui.typewrite(userID)
 
+AANTAL_X = 760
+AANTAL_Y = 720
+def insert_aantal(aantal):
+    gui.click(AANTAL_X,AANTAL_Y)
+    gui.typewrite(aantal)
+
+VERKOPER_DROPDOWN_X = 808
+VERKOPER_DROPDOWN_Y = 600
+AUTO_INBOEKER_X = 0
+AUTO_INBOEKER_Y = 0
+def select_verkoper():
+    gui.click(VERKOPER_DROPDOWN_X,VERKOPER_DROPDOWN_Y)
+    gui.CLICK(AUTO_INBOEKER_X, AUTO_INBOEKER_Y)
+
 CORRECTUSER_Y = 285
 CORRECTUSER_X1 = 350
 CORRECTUSER_X2 = 470
@@ -122,10 +136,35 @@ def checknopopup(refpop_buf, test="notest"):
         time.sleep(1)  # wait before checking again if popup has cleared
         print("Checking again")
 
-def checklog(plu,artikelnaam,mollie_ID):
-    file = "log/" + plu + " " + artikelnaam + ".txt"
-    try
-    open()
+path_log = lambda plu, artikelnaam : "log/" + str(plu) + " " + artikelnaam + ".xlsx"
+
+def checklog(plu,artikelnaam,mollie_ID, aantal):
+    #Returns false if inboek operation has not been found in the logbook
+    path = path_log(plu, artikelnaam)
+    try: #try to find the logbook
+        df = pd.read_excel(path)
+    except:
+        print("no log found")
+        return False #there is no log, thus the inboek operation is not found
+
+    if mollie_ID in df["Mollie-ID"].unique(): #checking if the mollie ID is in the logbook
+        df = df.set_index("Mollie-ID")#set the mollie ID as index
+        if df.loc[mollie_ID]['Aantal']== aantal: #checking if the aantal matches
+            #this only works if any given operation is only once in the log book, if it is in there twice it will throw an exception
+            return True #same operation has been found in the log
+    return False #the inboek operation has not been found in the log
+
+LOG_CSV_COLUMNS = ["Mollie-ID", "ID-nummer", "Naam", "Aantal"]
+def log_inboeken(plu,artikelnaam,mollie_ID,id,persoon,aantal):
+    path = path_log(plu, artikelnaam)
+
+    try: df = pd.read_excel(path)
+    except:
+        df = pd.DataFrame(columns=LOG_CSV_COLUMNS)
+        print('new log file created')
+    new_row = {"Mollie-ID": mollie_ID, "ID-nummer": id, "Naam": persoon, "Aantal": aantal}
+    df = df.append(new_row, ignore_index=True)
+    df.to_excel(path, index=False)
 
 def confirm_inboeken():
     gui.press("F5")
@@ -137,33 +176,34 @@ if __name__ == '__main__':
     filename = input()
     refpop_im = Image.open('TestData/snelstart.png') #loading reference
     refpop_buf = np.asarray(refpop_im) #creating refrence buffer
-
     id, plu, personen, aantal, mollie_ID, artikelnaam= readdata(filename)
     time.sleep(2) #delay such that you can change screen
+
     for i in range(len(id)):
-        #check if data is in logbook
+        if checklog(plu[i],artikelnaam[i],mollie_ID[i], aantal[i]):#checking if inboek operation already has been done
+            message = str(aantal[i]) + " x " + str(plu[i]) + personen[i] + "is already booked in"
+            raise(message) #raising exception
         insert_data(id[i], plu[i]) #Fill in username and product
         gui.click(OMSCHRIJVING_X, OMSCHRIJVING_Y) #click away such that the omschrijving is not blue
-        checknopopup(refpop_buf)  # Check if there is no popup
+        checknopopup(refpop_buf)  #Check if there is no popup
         if checkuserisnkown() != True:
-            #insert in unkownuserlogbook
-            insert_unkown_user(personen[i])
-        #insert data in logbook
+            log_inboeken(plu[i],"onbekend" + artikelnaam[i],mollie_ID[i],id[i],personen[i],aantal[i])#insert in unkownuserlogbook
+            insert_unkown_user(personen[i]) #inserting unkown user
+        if aantal[i] != 1:insert_aantal(aantal[i]) #if aantall is other than 1 insert in aantal field
+        select_verkoper()
+        log_inboeken(plu[i],artikelnaam[i],mollie_ID[i],id[i],personen[i],aantal[i])#insert data in logbook
         confirm_inboeken() #print contantbon
-        #locaties
 
     print("Inboeken Completed")
 
 
 #TODO
-# * GUI maken    fff
+# * GUI maken
 #   - Startupscreen met allemaal 66 vo dingen
 #   - Countdown timer voor het beginnen
 #   - Ergens popup laten zien waar hij mee bezig is
 #   - Contact info van mij laten zien
 # * Het aantal column laten invullen (mensen uitboeken/meerdere dingen kopen) (if not equal 1)
-# * Exporteren onbekende klanten
-# * Inboeken op autoinboek medewerker
-# * Implementeren dat hij makkelijk geen bonnetjes laat printen #gogreen
-# * FINAL Compilen van code naar een EXE
+
+# * FINAL Compilen van code naar een E
 # * Website direct de excel laten downloaden
