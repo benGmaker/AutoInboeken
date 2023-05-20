@@ -231,8 +231,8 @@ if __name__ == '__main__':
 
     for i in range(len(id)):
         if checklog(plu[i],artikelnaam[i],mollie_ID[i], aantal[i]):#checking if inboek operation already has been done
-            message = str(aantal[i]) + " x " + str(plu[i]) + personen[i] + "is already booked in"
-            raise(message) #raising exception
+            print("{}x {}, {}, ({}) {} is already booked in".format(aantal[i], plu[i],artikelnaam[i],id[i],personen[i],))
+            continue
         insert_data(id[i], plu[i]) #Fill in username and product
         gui.click(OMSCHRIJVING_X, OMSCHRIJVING_Y) #click away such that the omschrijving is not blue
         checknopopup(refpop_buf)  #Check if there is no popup
@@ -242,7 +242,6 @@ if __name__ == '__main__':
         if aantal[i] != 1:insert_aantal(aantal[i]) #if aantall is other than 1 insert in aantal field
         select_verkoper()
         log_inboeken(plu[i],artikelnaam[i],mollie_ID[i],id[i],personen[i],aantal[i])#insert data in logbook
-
         confirm_inboeken() #print contantbon
         print("booked in {}x {}, {}, ({}) {}".format(aantal[i], plu[i],artikelnaam[i],id[i],personen[i],))
     cli_gui.printlogo()
