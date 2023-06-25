@@ -146,7 +146,6 @@ def checkuserisnkown(test="notest"):
         return False
 
 NOPOPUP_THRESSHOLD = 20345678
-
 def checknopopup(refpop_buf, test="notest"):
     debug = False
     if test != "notest":  # checking if we are in debug mode
@@ -221,12 +220,18 @@ def confirm_inboeken():
     time.sleep(8) #wait 8 second to print contantbon
 
 if __name__ == '__main__':
+    with open("instructions.txt", "r") as f:
+        text = f.read()
     cli_gui = CLI_GUI()
     cli_gui.startupscreen(1)
+    print(text)
     print('\n Insert Name Excel Sheet')
-    filename = input()
-    refpop_im = Image.open('TestData/snelstart.png') #loading reference
-    refpop_buf = np.asarray(refpop_im) #creating refrence buffer
+    filename = input() #waiting for file input
+
+    reference_im_1 = Image.open('REF1.png') #loading reference for without filled in client
+    reference_im_2 = Image.open('REF2.png') #loading reference for with filled in client
+    reference_buf_1 = np.asarray(reference_im_1)
+    reference_buf_2 = np.asarray(reference_im_2) #creating refrence buffers
     id, plu, personen, aantal, mollie_ID, artikelnaam= readdata(filename)
     cli_gui.printlogo()
 
@@ -234,14 +239,20 @@ if __name__ == '__main__':
         if checklog(plu[i],artikelnaam[i],mollie_ID[i], aantal[i]):#checking if inboek operation already has been done
             print("{}x {}, {}, ({}) {} is already booked in".format(aantal[i], plu[i],artikelnaam[i],id[i],personen[i],))
             continue
+
+        checknopopup(reference_buf_1)  # Check if there is no popup after filling in data
         insert_data(id[i], plu[i]) #Fill in username and product
-        gui.click(OMSCHRIJVING_X, OMSCHRIJVING_Y) #click away such that the omschrijving is not blue
+        #gui.click(OMSCHRIJVING_X, OMSCHRIJVING_Y) #click away such that the omschrijving is not blue
 
         if checkuserisnkown() != True:
             log_inboeken(plu[i],"onbekend" + artikelnaam[i],mollie_ID[i],id[i],personen[i],aantal[i])#insert in unkownuserlogbook
             insert_unkown_user(personen[i]) #inserting unkown user
-        if aantal[i] != 1:insert_aantal(aantal[i]) #if aantall is other than 1 insert in aantal field
-        checknopopup(refpop_buf)  # Check if there is no popup
+            checknopopup(reference_buf_1)  # Check if there is no popup after filling in data
+        else:
+            checknopopup(reference_buf_2)  #Check if there is no popup after a known user is filled in
+
+        #if aantal[i] != 1:insert_aantal(aantal[i]) #if aantall is other than 1 insert in aantal field
+
         #select_verkoper()
         log_inboeken(plu[i],artikelnaam[i],mollie_ID[i],id[i],personen[i],aantal[i])#insert data in logbook
         confirm_inboeken() #print contantbon
@@ -252,7 +263,8 @@ if __name__ == '__main__':
 
 #TODO
 #klant check controle fixen
-#refrence foto nemen
+# verbeteren zodat hij minder gevoellig is en beter werk
+#optimalizeren van inboek proces
+#instructies laten printen voordat je de bestandsnaam moet invullen
 #bij artikelcode 0 stoppen
 #log verbeteren
-#uitzoeken waarom hij een naam met dubbele punt niet kan opslaan

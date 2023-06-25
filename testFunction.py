@@ -17,17 +17,30 @@ def test_checknopopup():
     print("--------------------------------")
     print("Testing checknopopup")
     #testing the checkNoPopUp function to calibrate thee Threshold value for having a popup
-    refPopImage = Image.open('TestData/snelstart.png')  # load reference
-    refPopBuf = np.asarray(refPopImage)  # saving reference as array
+    reference_im_1 = Image.open('REF1.png') #loading reference for without filled in client
+    reference_im_2 = Image.open('REF2.png') #loading reference for with filled in client
+    reference_buf_1 = np.asarray(reference_im_1)
+    reference_buf_2 = np.asarray(reference_im_2) #creating refrence buffers
 
     #Checking what kind of values we get
-    autoinboeken.checknopopup(refPopBuf, "TestData/snelstart.png") #no popup
-    autoinboeken.checknopopup(refPopBuf, "TestData/filled_in_article.png")  # no popup
-    autoinboeken.checknopopup(refPopBuf, "TestData/klantingevuld.png") #no popup
-    autoinboeken.checknopopup(refPopBuf, "TestData/boekhouden.png")
-    autoinboeken.checknopopup(refPopBuf, "TestData/excelopsherm.png")
-    autoinboeken.checknopopup(refPopBuf, "TestData/kleinepopup.png")
-    autoinboeken.checknopopup(refPopBuf, "TestData/metprompt.png")
+    print("testing first reference image")
+    autoinboeken.checknopopup(reference_buf_1, "TestData/snelstart.png") #no popup
+
+
+    autoinboeken.checknopopup(reference_buf_1, "TestData/boekhouden.png")
+    autoinboeken.checknopopup(reference_buf_1, "TestData/excelopsherm.png")
+    autoinboeken.checknopopup(reference_buf_1, "TestData/kleinepopup.png")
+    autoinboeken.checknopopup(reference_buf_1, "TestData/metprompt.png")
+
+    print("Testing second reference image")
+    autoinboeken.checknopopup(reference_buf_2, "TestData/klantingevuld.png")  # no popup
+    autoinboeken.checknopopup(reference_buf_2, "TestData/filled_in_article.png")  # no popup
+
+    autoinboeken.checknopopup(reference_buf_2, "TestData/boekhouden.png")
+    autoinboeken.checknopopup(reference_buf_2, "TestData/excelopsherm.png")
+    autoinboeken.checknopopup(reference_buf_2, "TestData/kleinepopup.png")
+    autoinboeken.checknopopup(reference_buf_2, "TestData/metprompt.png")
+
 
 path_log = lambda plu, artikelnaam : "log/" + str(plu) + " " + artikelnaam + ".xlsx"
 TEST_PLU = 66
@@ -67,9 +80,8 @@ path_log = lambda plu, artikelnaam : "log/" + str(plu) + " " + artikelnaam + ".x
 if __name__ == '__main__':
     #test_GUI()
     #test_checkuseriskown()
-    #test_checknopopup()
-    print(path_log(615, "yeet: t"))
-    test_log_inboeken()
+    test_checknopopup()
+    #test_log_inboeken()
     #test_checklog()
 
 
