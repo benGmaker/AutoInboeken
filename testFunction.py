@@ -11,6 +11,7 @@ def test_checkuseriskown():
     print("Testing checkuseriskown")
     print(autoinboeken.checkuserisnkown('TestData/klantingevuld.png'))  # screen with user found -> image sum = 91400
     print(autoinboeken.checkuserisnkown('TestData/snelstart.png'))  # screen without user found -> image sum = 122400
+    print(autoinboeken.checkuserisnkown('TestData/klantCheck gone wrong 8-6-2023.png'))
 
 def test_checknopopup():
     print("--------------------------------")
@@ -49,6 +50,7 @@ def test_log_inboeken():
     print("--------------------------------")
     print("Testing log_inboeken")
     autoinboeken.log_inboeken(661, "mooie voorzitters", "mollie_ABC123", 1445758, "Ben Gortemaker", 1)
+    autoinboeken.log_inboeken(661, "mooie: voorzitters", "mollie_ABC123", 1445758, "Ben Gortemaker", 1) #testen of dubbele punt werk
 
 def asciart():
     asciArtGenerator.generateASCIart('ASCI-art/66logo.PNG')
@@ -59,11 +61,15 @@ def test_GUI():
     gui.startupscreen(1)
     gui.printlogo()
 
+path_log = lambda plu, artikelnaam : "log/" + str(plu) + " " + artikelnaam + ".xlsx"
+
+
 if __name__ == '__main__':
     #test_GUI()
     #test_checkuseriskown()
     #test_checknopopup()
-    #test_log_inboeken()
+    print(path_log(615, "yeet: t"))
+    test_log_inboeken()
     #test_checklog()
 
 

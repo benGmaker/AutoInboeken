@@ -131,7 +131,7 @@ def checkuserisnkown(test="notest"):
     else:
         screenshot = gui.screenshot()
         screenshot.save("klantCheck.png")
-        image = Image.open('TestData/klantCheck.png');  # loading in the screenshot
+        image = Image.open('klantCheck.png');  # loading in the screenshot
 
     colorsum = 0
     for i in range(CORRECTUSER_X1, CORRECTUSER_X2):
@@ -145,7 +145,8 @@ def checkuserisnkown(test="notest"):
     else:
         return False
 
-NOPOPUP_THRESSHOLD = 14345678
+NOPOPUP_THRESSHOLD = 20345678
+
 def checknopopup(refpop_buf, test="notest"):
     debug = False
     if test != "notest":  # checking if we are in debug mode
@@ -158,13 +159,13 @@ def checknopopup(refpop_buf, test="notest"):
         else:
             screenshot = gui.screenshot()  # making screenshot
             screenshot.save("popupCheck.png")
-            image = Image.open("TestData/popupCheck.png")
+            image = Image.open("popupCheck.png")
 
         check_buff = np.asarray(image)  # loading screenshot in as array
-        difference = check_buff[300:1080, 1:1900] - refpop_buf[300:1080,
-                                                    1:1900]  # getting the differnce between image and refrence
+        difference = check_buff[300:900, 1:1900] - refpop_buf[300:900,1:1900]  # getting the differnce between image and refrence
         greyscale_diff = np.sum(difference, 2)
         result = np.sum(greyscale_diff)  # resulting collor difference value
+        print(result)
         if result <= NOPOPUP_THRESSHOLD:
             if debug:
                 # im = Image.fromarray(greyscale) #showing image takes long
@@ -204,8 +205,8 @@ def checklog(plu,artikelnaam,mollie_ID, aantal):
 
 LOG_CSV_COLUMNS = ["Mollie-ID", "ID-nummer", "Naam", "Aantal"]
 def log_inboeken(plu,artikelnaam,mollie_ID,id,persoon,aantal):
+    artikelnaam = artikelnaam.replace(":", "-") #removing ":" because otherwise excel wont save the file
     path = path_log(plu, artikelnaam)
-
     try: df = pd.read_excel(path)
     except:
         df = pd.DataFrame(columns=LOG_CSV_COLUMNS)
@@ -235,14 +236,23 @@ if __name__ == '__main__':
             continue
         insert_data(id[i], plu[i]) #Fill in username and product
         gui.click(OMSCHRIJVING_X, OMSCHRIJVING_Y) #click away such that the omschrijving is not blue
-        checknopopup(refpop_buf)  #Check if there is no popup
+
         if checkuserisnkown() != True:
             log_inboeken(plu[i],"onbekend" + artikelnaam[i],mollie_ID[i],id[i],personen[i],aantal[i])#insert in unkownuserlogbook
             insert_unkown_user(personen[i]) #inserting unkown user
         if aantal[i] != 1:insert_aantal(aantal[i]) #if aantall is other than 1 insert in aantal field
-        select_verkoper()
+        checknopopup(refpop_buf)  # Check if there is no popup
+        #select_verkoper()
         log_inboeken(plu[i],artikelnaam[i],mollie_ID[i],id[i],personen[i],aantal[i])#insert data in logbook
         confirm_inboeken() #print contantbon
         print("booked in {}x {}, {}, ({}) {}".format(aantal[i], plu[i],artikelnaam[i],id[i],personen[i],))
     cli_gui.printlogo()
     print("Inboeken has succesfully been Accererated!")
+
+
+#TODO
+#klant check controle fixen
+#refrence foto nemen
+#bij artikelcode 0 stoppen
+#log verbeteren
+#uitzoeken waarom hij een naam met dubbele punt niet kan opslaan
