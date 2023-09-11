@@ -117,8 +117,8 @@ def select_verkoper():
 
 CORRECTUSER_Y = 285
 CORRECTUSER_X1 = 350
-CORRECTUSER_X2 = 470
-UNKOWNUSER_COLORSUM = 91800
+CORRECTUSER_X2 = 380
+UNKOWNUSER_COLORSUM = 22950
 UNKOWNUSER_MARGIN = 2000
 def checkuserisnkown(test="notest"):
     debug = False
@@ -243,7 +243,7 @@ if __name__ == '__main__':
         checknopopup(reference_buf_1)  # Check if there is no popup after filling in data
         insert_data(id[i], plu[i]) #Fill in username and product
         #gui.click(OMSCHRIJVING_X, OMSCHRIJVING_Y) #click away such that the omschrijving is not blue
-
+        time.sleep(0.5)  # wait until known user shows up
         if checkuserisnkown() != True:
             log_inboeken(plu[i],"onbekend" + artikelnaam[i],mollie_ID[i],id[i],personen[i],aantal[i])#insert in unkownuserlogbook
             insert_unkown_user(personen[i]) #inserting unkown user

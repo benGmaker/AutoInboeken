@@ -79,8 +79,8 @@ path_log = lambda plu, artikelnaam : "log/" + str(plu) + " " + artikelnaam + ".x
 
 if __name__ == '__main__':
     #test_GUI()
-    #test_checkuseriskown()
-    test_checknopopup()
+    test_checkuseriskown()
+    #test_checknopopup()
     #test_log_inboeken()
     #test_checklog()
 
