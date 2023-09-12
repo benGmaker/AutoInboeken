@@ -184,11 +184,16 @@ def checknopopup(refpop_buf, test="notest"):
         time.sleep(1)  # wait before checking again if popup has cleared
         print("Checking again")
 
-path_log = lambda plu, artikelnaam : "log/" + str(plu) + " " + artikelnaam + ".xlsx"
+
+def path_log(plu, artikelnaam):
+    path = "log/" + str(plu) + " " + artikelnaam + ".xlsx"
+    path = path.replace(":", "-") #removing illigal characters
+    return path
+
 
 def checklog(plu,artikelnaam,mollie_ID, aantal):
     #Returns false if inboek operation has not been found in the logbook
-    path = path_log(plu, artikelnaam)
+    path = path_log(plu, artikelnaam) #generating path name
     try: #try to find the logbook
         df = pd.read_excel(path)
     except:
@@ -197,14 +202,13 @@ def checklog(plu,artikelnaam,mollie_ID, aantal):
 
     if mollie_ID in df["Mollie-ID"].unique(): #checking if the mollie ID is in the logbook
         df = df.set_index("Mollie-ID")#set the mollie ID as index
-        if df.loc[mollie_ID]['Aantal']== aantal: #checking if the aantal matches
+        if df.loc[mollie_ID]['Aantal'] == aantal: #checking if the aantal matches
             #this only works if any given operation is only once in the log book, if it is in there twice it will throw an exception
             return True #same operation has been found in the log
     return False #the inboek operation has not been found in the log
 
 LOG_CSV_COLUMNS = ["Mollie-ID", "ID-nummer", "Naam", "Aantal"]
 def log_inboeken(plu,artikelnaam,mollie_ID,id,persoon,aantal):
-    artikelnaam = artikelnaam.replace(":", "-") #removing ":" because otherwise excel wont save the file
     path = path_log(plu, artikelnaam)
     try: df = pd.read_excel(path)
     except:

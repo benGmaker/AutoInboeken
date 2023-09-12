@@ -42,28 +42,41 @@ def test_checknopopup():
     autoinboeken.checknopopup(reference_buf_2, "TestData/metprompt.png")
 
 
-path_log = lambda plu, artikelnaam : "log/" + str(plu) + " " + artikelnaam + ".xlsx"
 TEST_PLU = 66
+TEST_PLU2 = 661
 TEST_ARTIKEL = "HULDE&VO"
+TEST_ARTIKEL2 = "Super: hulde"
 TEST_MOLLIE_ID = 'mollie_ABC123'
 def test_checklog():
     print("--------------------------------")
     print("Testing checklog")
     df = pd.DataFrame() #emptying any existing data
-    df.to_excel(path_log(TEST_PLU,TEST_ARTIKEL))
+    df.to_excel(autoinboeken.path_log(TEST_PLU,TEST_ARTIKEL))
     # writing 1 entry in the logbook
+    print("data input is one entry")
     autoinboeken.log_inboeken(TEST_PLU,TEST_ARTIKEL,TEST_MOLLIE_ID, 1445758, "Ben Gortemaker", 1)
     #performing tests
+    print("Case 1: normal case -> True")
     print(autoinboeken.checklog(TEST_PLU, TEST_ARTIKEL, TEST_MOLLIE_ID,1)) #True
+    print("Case 2: negative/other amount in data -> False")
     print(autoinboeken.checklog(TEST_PLU, TEST_ARTIKEL, TEST_MOLLIE_ID, -1)) #False
-    print(autoinboeken.checklog(TEST_PLU, TEST_ARTIKEL, TEST_MOLLIE_ID, 66))  #False
-    print(autoinboeken.checklog(TEST_PLU, TEST_ARTIKEL, "ander_mollie_id",1)) #False
+    print("Case 3: different mollie_id -> False")
+    print(autoinboeken.checklog(TEST_PLU, TEST_ARTIKEL, "ander_mollie_id",1)) #False. mollie id should not be in the data
+
+    print("Case 4: article name with illigal charachter ':' -> True")
+    #second case with ":" in article name
+    df = pd.DataFrame() #emptying any existing data
+    df.to_excel(autoinboeken.path_log(TEST_PLU2,TEST_ARTIKEL2.replace(":", "-")))
+    # writing 1 entry in the logbook
+    autoinboeken.log_inboeken(TEST_PLU2,TEST_ARTIKEL2,TEST_MOLLIE_ID, 1445758, "Ben Gortemaker", 1)
+
+    print(autoinboeken.checklog(TEST_PLU2, TEST_ARTIKEL2, TEST_MOLLIE_ID, 1))  # True, data should be found
 
 def test_log_inboeken():
     print("--------------------------------")
     print("Testing log_inboeken")
     autoinboeken.log_inboeken(661, "mooie voorzitters", "mollie_ABC123", 1445758, "Ben Gortemaker", 1)
-    autoinboeken.log_inboeken(661, "mooie: voorzitters", "mollie_ABC123", 1445758, "Ben Gortemaker", 1) #testen of dubbele punt werk
+    autoinboeken.log_inboeken(661, "mooie: voorzittersvo", "mollie_ABC123", 1445758, "Ben Gortemaker", 1) #testen of dubbele punt werk
 
 def asciart():
     asciArtGenerator.generateASCIart('ASCI-art/66logo.PNG')
@@ -74,15 +87,12 @@ def test_GUI():
     gui.startupscreen(1)
     gui.printlogo()
 
-path_log = lambda plu, artikelnaam : "log/" + str(plu) + " " + artikelnaam + ".xlsx"
-
-
 if __name__ == '__main__':
     #test_GUI()
-    test_checkuseriskown()
+    #test_checkuseriskown()
     #test_checknopopup()
-    #test_log_inboeken()
-    #test_checklog()
+    test_log_inboeken()
+    test_checklog()
 
 
 
