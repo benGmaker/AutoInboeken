@@ -214,10 +214,10 @@ def log_inboeken(plu,artikelnaam,mollie_ID,id,persoon,aantal):
     except:
         df = pd.DataFrame(columns=LOG_CSV_COLUMNS)
         print('new log file created')
-    new_row = {"Mollie-ID": mollie_ID, "ID-nummer": id, "Naam": persoon, "Aantal": aantal}
-    df = df.append(new_row, ignore_index=True)
-    df.to_excel(path, index=False)
-
+    new_row = pd.DataFrame([[mollie_ID,id,persoon,aantal]],columns=LOG_CSV_COLUMNS)
+    newdata = pd.concat([df, new_row])
+    newdata.to_excel(path, index=False)
+    print(newdata)
 def confirm_inboeken():
     gui.press("F5")
     gui.hotkey("ALT","N")
