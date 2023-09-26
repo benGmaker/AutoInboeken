@@ -59,9 +59,7 @@ def readdata(file):
     df = pd.read_excel(file) #reading in the data
     plu = df.iloc[:, 4]
     personen = df.iloc[:, 3]
-    personen = personen.astype(str) #setting type to string to prevent incorrect data for next function
-
-
+    personen = personen.astype(str) #making sure type is string such that the next function will work
     id = personen.apply(lambda st: st[st.find("(") + 1:st.find(")")])  # extracting user unique ID's
     mollie_ID = df.iloc[:,1]
     aantal = df.iloc[:,5]
