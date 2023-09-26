@@ -1,0 +1,12 @@
+Instructions:
+1. Copy and paste bookings into an Excel file named with the date, and set the bookings as done on the website.
+2. Fill in the Excel file name into the command prompt bellow and press enter
+3. Check if the booking goes correctly. If anything goes WRONG: press CTRL + C in the command prompt.
+4. Watch out for any users which are incorrectly seen as unknown clients
+5. Keep in mind that the code only checks for popups before and after filling in data, not whilst filling in.
+
+In case something goes wrong:
+1. In case that something goes wrong you can check which actions have been taken in the command prompt
+2. If you want to redo any bookings remove them from the logbook, otherwise these will be skipped (by design)
+3. Call the penno, or if the code is broken contact the Chairman and Editor-in-Chief of the 66th Board
+

@@ -59,6 +59,7 @@ def readdata(file):
     df = pd.read_excel(file) #reading in the data
     plu = df.iloc[:, 4]
     personen = df.iloc[:, 3]
+    personen = personen.astype(str) #Making sure data in DF is a string otherwise next line wont work
     id = personen.apply(lambda st: st[st.find("(") + 1:st.find(")")])  # extracting user unique ID's
     mollie_ID = df.iloc[:,1]
     aantal = df.iloc[:,5]
@@ -145,7 +146,7 @@ def checkuserisnkown(test="notest"):
     else:
         return False
 
-NOPOPUP_THRESSHOLD = 20345678
+NOPOPUP_THRESSHOLD = 64281953
 def checknopopup(refpop_buf, test="notest"):
     debug = False
     if test != "notest":  # checking if we are in debug mode
@@ -217,7 +218,7 @@ def log_inboeken(plu,artikelnaam,mollie_ID,id,persoon,aantal):
     new_row = pd.DataFrame([[mollie_ID,id,persoon,aantal]],columns=LOG_CSV_COLUMNS)
     newdata = pd.concat([df, new_row])
     newdata.to_excel(path, index=False)
-    print(newdata)
+
 def confirm_inboeken():
     gui.press("F5")
     gui.hotkey("ALT","N")

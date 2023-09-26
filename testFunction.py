@@ -87,12 +87,17 @@ def test_GUI():
     gui.startupscreen(1)
     gui.printlogo()
 
+def test_readdata():
+    autoinboeken.readdata("TestData/Example spreadsheet.xlsx")
+    autoinboeken.readdata("TestData/2023-09-26.xlsx")
+
 if __name__ == '__main__':
+    test_readdata()
     #test_GUI()
     #test_checkuseriskown()
     #test_checknopopup()
-    test_log_inboeken()
-    test_checklog()
+    #test_log_inboeken()
+    #test_checklog()
 
 
 
